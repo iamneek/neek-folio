@@ -5,6 +5,7 @@ date: "May 3 2026"
 demoURL: "https://github.com/iamneek/"
 repoURL: "https://github.com/iamneek/"
 // pin: true
+tags: ["Java", "JSP", "Servlets", "MySQL"]
 ---
 
 Skill Sewa is a Java-based web application that helps people teach and learn skills in a simple marketplace-style environment.

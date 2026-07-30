@@ -4,6 +4,7 @@ description: "Django image sharing social webapp."
 date: "Jun 5 2026"
 demoURL: "https://snapgram-k2zw.onrender.com/"
 repoURL: "https://github.com/iamneek/snapgram"
+tags: ["Python", "Django", "PostgreSQL"]
 ---
 
 A simple Instagram-like social media web app built with Django. Users can sign up, share photo posts, like and comment on posts, and manage their profiles.

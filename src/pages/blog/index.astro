@@ -29,19 +29,38 @@ const posts = data.reduce((acc: Acc, post) => {
     return acc;
   }, {});
 
-const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a)); 
+const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
+const allTags = [...new Set(data.flatMap(post => post.data.tags || []))].sort();
 ---
 
 <PageLayout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
   <Container>
     <div class="space-y-10">
-      <div class="animate font-semibold text-black dark:text-white">
-        Blog
+      <div class="flex items-center justify-between">
+        <div class="animate font-semibold text-black dark:text-white">
+          Blog
+        </div>
+        
+        {allTags.length > 0 && (
+          <div class="animate relative" data-all-tags={JSON.stringify(allTags)}>
+            <button 
+              id="filter-toggle"
+              class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+              </svg>
+              <span class="font-medium">Filters</span>
+              <span id="filter-count" class="hidden text-xs px-1.5 py-0.5 rounded-full bg-black/10 dark:bg-white/20"></span>
+            </button>
+          </div>
+        )}
       </div>
-      <div class="space-y-4">
+      
+      <div id="blog-list" class="space-y-4">
         {years.map((year, yearIndex) => (
-          <section class="animate space-y-4">
-            <div class="font-semibold text-black dark:text-white">
+          <section class="animate space-y-4 year-section" data-year={year}>
+            <div class="font-semibold text-black dark:text-white year-header">
               {year}
             </div>
             <div>
@@ -54,11 +73,11 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
                     
                     return (
                       <>
-                        <li>
+                        <li data-tags={JSON.stringify(post.data.tags || [])}>
                           <ArrowCard entry={post} showPin={true}/>
                         </li>
                         {showSeparator && (
-                          <li class="border-t border-black/10 dark:border-white/25"></li>
+                          <li class="separator border-t border-black/10 dark:border-white/25"></li>
                         )}
                       </>
                     );
@@ -72,3 +91,222 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
     </div>
   </Container>
 </PageLayout>
+
+
+
+<script is:inline>
+  document.addEventListener('astro:page-load', () => {
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterParent = filterToggle?.closest('[data-all-tags]');
+    const filterCount = document.getElementById('filter-count');
+    const blogList = document.getElementById('blog-list');
+    let activeTags = new Set();
+    let dropdownEl = null;
+    
+    if (!filterToggle || !filterParent) return;
+    
+    filterToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (dropdownEl) {
+        dropdownEl.remove();
+        dropdownEl = null;
+        return;
+      }
+      showDropdown();
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (dropdownEl && !dropdownEl.contains(e.target) && e.target !== filterToggle) {
+        dropdownEl.remove();
+        dropdownEl = null;
+      }
+    });
+    
+    function showDropdown() {
+      const rect = filterToggle.getBoundingClientRect();
+      const isDark = document.documentElement.classList.contains('dark');
+      const allTags = JSON.parse(filterParent.getAttribute('data-all-tags') || '[]');
+      
+      dropdownEl = document.createElement('div');
+      dropdownEl.style.cssText = `
+        position: fixed;
+        top: ${rect.bottom + 8}px;
+        right: ${window.innerWidth - rect.right}px;
+        width: 256px;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'};
+        background-color: ${isDark ? '#1c1917' : '#f5f5f4'};
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        z-index: 9999;
+        pointer-events: auto;
+        box-sizing: border-box;
+      `;
+      
+      const input = document.createElement('input');
+      input.placeholder = 'Search tags...';
+      input.style.cssText = `
+        width: 100%;
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'};
+        background-color: ${isDark ? '#000' : '#fff'};
+        color: ${isDark ? '#fff' : '#000'};
+        outline: none;
+        box-sizing: border-box;
+      `;
+      
+      const listContainer = document.createElement('div');
+      listContainer.style.cssText = `max-height: 192px; overflow-y: auto; margin-top: 8px;`;
+      
+      const checkboxes = [];
+      
+      allTags.forEach(tag => {
+        const label = document.createElement('label');
+        label.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 8px;
+          font-size: 14px;
+          border-radius: 4px;
+          cursor: pointer;
+          color: ${isDark ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)'};
+          transition: background-color 0.15s;
+        `;
+        label.addEventListener('mouseenter', () => { label.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'; });
+        label.addEventListener('mouseleave', () => { label.style.backgroundColor = 'transparent'; });
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        if (activeTags.has(tag)) checkbox.checked = true;
+        
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            activeTags.add(tag);
+          } else {
+            activeTags.delete(tag);
+          }
+          filterPosts();
+          updateUI();
+        });
+        
+        const span = document.createElement('span');
+        span.textContent = tag;
+        
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        listContainer.appendChild(label);
+        checkboxes.push(checkbox);
+      });
+      
+      input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        listContainer.querySelectorAll('label').forEach(label => {
+          const text = label.querySelector('span')?.textContent?.toLowerCase() || '';
+          label.style.display = text.includes(query) ? 'flex' : 'none';
+        });
+      });
+      
+      dropdownEl.appendChild(input);
+      dropdownEl.appendChild(listContainer);
+      
+      if (activeTags.size > 0) {
+        const clearBtn = document.createElement('button');
+        clearBtn.textContent = 'Clear all';
+        clearBtn.style.cssText = `
+          width: 100%;
+          margin-top: 8px;
+          padding: 6px 12px;
+          font-size: 14px;
+          border-radius: 4px;
+          border: none;
+          background-color: ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'};
+          cursor: pointer;
+          color: inherit;
+        `;
+        clearBtn.addEventListener('click', () => {
+          activeTags.clear();
+          checkboxes.forEach(cb => cb.checked = false);
+          filterPosts();
+          updateUI();
+          clearBtn.remove();
+        });
+        dropdownEl.appendChild(clearBtn);
+      }
+      
+      document.body.appendChild(dropdownEl);
+      
+      input.focus();
+    }
+    
+    function filterPosts() {
+      const sections = blogList?.querySelectorAll('.year-section');
+      if (!sections) return;
+      
+      sections.forEach(section => {
+        const items = section.querySelectorAll('li');
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+          if (item.classList.contains('separator')) {
+            item.classList.add('hidden');
+            return;
+          }
+          
+          const tagsAttr = item.getAttribute('data-tags');
+          if (!tagsAttr) {
+            item.style.display = activeTags.size === 0 ? '' : 'none';
+            if (activeTags.size === 0) visibleCount++;
+            return;
+          }
+          
+          const itemTags = JSON.parse(tagsAttr);
+          const hasMatch = activeTags.size === 0 || itemTags.some((tag) => activeTags.has(tag));
+          item.style.display = hasMatch ? '' : 'none';
+          if (hasMatch) visibleCount++;
+        });
+        
+        const yearHeader = section.querySelector('.year-header');
+        if (yearHeader) {
+          yearHeader.style.display = visibleCount > 0 ? '' : 'none';
+        }
+        
+        section.style.display = visibleCount > 0 ? '' : 'none';
+        
+        updateSeparators(section);
+      });
+    }
+    
+    function updateSeparators(section) {
+      const items = section.querySelectorAll('li');
+      if (!items) return;
+      
+      items.forEach((item, index) => {
+        if (!item.classList.contains('separator')) return;
+        
+        const prevItem = items[index - 1];
+        const nextItem = items[index + 1];
+        
+        if (!prevItem || !nextItem || 
+            prevItem.style.display === 'none' || 
+            nextItem.style.display === 'none') {
+          item.classList.add('hidden');
+        } else {
+          item.classList.remove('hidden');
+        }
+      });
+    }
+    
+    function updateUI() {
+      if (!filterCount) return;
+      if (activeTags.size > 0) {
+        filterCount.classList.remove('hidden');
+        filterCount.textContent = activeTags.size.toString();
+      } else {
+        filterCount.classList.add('hidden');
+      }
+    }
+  });
+</script>
