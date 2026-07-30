@@ -7,7 +7,11 @@ import { PROJECTS } from "@consts";
 
 const projects = (await getCollection("projects"))
   .filter(project => !project.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  .sort((a, b) => {
+    if (a.data.pin && !b.data.pin) return -1;
+    if (!a.data.pin && b.data.pin) return 1;
+    return b.data.date.valueOf() - a.data.date.valueOf();
+  });
 ---
 
 <PageLayout title={PROJECTS.TITLE} description={PROJECTS.DESCRIPTION}>
@@ -18,11 +22,22 @@ const projects = (await getCollection("projects"))
       </div>
       <ul class="animate flex flex-col gap-4">
         {
-          projects.map((project) => (
-            <li>
-              <ArrowCard entry={project}/>
-            </li>
-          ))
+          projects.map((project, index) => {
+            const isPinned = project.data.pin;
+            const nextProject = projects[index + 1];
+            const showSeparator = isPinned && nextProject && !nextProject.data.pin;
+            
+            return (
+              <>
+                <li>
+                  <ArrowCard entry={project} showPin={true}/>
+                </li>
+                {showSeparator && (
+                  <li class="border-t border-black/10 dark:border-white/25"></li>
+                )}
+              </>
+            );
+          })
         }
       </ul>
     </div>

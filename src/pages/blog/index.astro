@@ -7,7 +7,14 @@ import { BLOG } from "@consts";
 
 const data = (await getCollection("blog"))
   .filter(post => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  .sort((a, b) => {
+    if (a.data.pin && !b.data.pin) return -1;
+    if (!a.data.pin && b.data.pin) return 1;
+    return b.data.date.valueOf() - a.data.date.valueOf();
+  });
+
+const pinnedPosts = data.filter(post => post.data.pin);
+const unpinnedPosts = data.filter(post => !post.data.pin);
   
 type Acc = {
   [year: string]: CollectionEntry<"blog">[];
@@ -32,7 +39,7 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
         Blog
       </div>
       <div class="space-y-4">
-        {years.map(year => (
+        {years.map((year, yearIndex) => (
           <section class="animate space-y-4">
             <div class="font-semibold text-black dark:text-white">
               {year}
@@ -40,11 +47,22 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
             <div>
               <ul class="flex flex-col gap-4">
                 {
-                  posts[year].map((post) => (
-                    <li>
-                      <ArrowCard entry={post}/>
-                    </li>
-                  ))
+                  posts[year].map((post, postIndex) => {
+                    const isPinned = post.data.pin;
+                    const nextPost = posts[year][postIndex + 1];
+                    const showSeparator = isPinned && nextPost && !nextPost.data.pin;
+                    
+                    return (
+                      <>
+                        <li>
+                          <ArrowCard entry={post} showPin={true}/>
+                        </li>
+                        {showSeparator && (
+                          <li class="border-t border-black/10 dark:border-white/25"></li>
+                        )}
+                      </>
+                    );
+                  })
                 }
               </ul>
             </div>

@@ -3,15 +3,19 @@ import type { CollectionEntry } from "astro:content";
 
 type Props = {
   entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
+  showPin?: boolean;
 }
 
-const { entry } = Astro.props;
+const { entry, showPin = false } = Astro.props;
 ---
 
 <a href={`/${entry.collection}/${entry.slug}`} class="relative group flex flex-nowrap py-3 px-4 pr-10 rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out">
   <div class="flex flex-col flex-1 truncate">
-    <div class="font-semibold">
+    <div class="font-semibold flex items-center gap-2">
       {entry.data.title}
+      {showPin && entry.data.pin && (
+        <span class="text-xs px-2 py-0.5 rounded bg-black/10 dark:bg-white/20">Pinned</span>
+      )}
     </div>
     <div class="text-sm">
       {entry.data.description}
