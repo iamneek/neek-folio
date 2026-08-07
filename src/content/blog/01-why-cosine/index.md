@@ -14,10 +14,6 @@ A dot product is an operation that takes two vectors and produces a single scala
 
 The algebraic definition of a vector dot product looks something like this for vector $a$ and $b$ :
 
-```python
-print("Hello world")
-```
-
 $$  
 \mathbf{a} \cdot \mathbf{b} = \sum_{i=1}^{n} a_i b_i = a_1 b_1 + a_2 b_2 + \dots + a_n b_n  
 $$
@@ -40,10 +36,11 @@ The dot product, as we know (or don't, no worries), is used to understand how we
 
 *Figure 1: components of a vector*
 </div>
-A 2d vector can be decomposed into 2 components, a horizontal and a vertical component. And, since we are only concerned with the alignment of vector `a` and `b`, we'll only care about the component of vector `a` that points in the direction of vector `b` (projection of vector `a` onto `b`) shown in figure 1 by the black line on top of the vector `b` line in this case. 
+
+A 2d vector can be decomposed into 2 components, a horizontal and a vertical component. And, since we are only concerned with the alignment of vector $a$ and $b$, we'll only care about the component of vector $a$ that points in the direction of vector $b$ (projection of vector $a$ onto $b$) shown in figure 1 by the black line on top of the vector $b$ line in this case. 
 
 **Intuition for projection:**
- Projection can be thought of as shining a flashlight perpendicular to the vector b, and the shadow cast by a onto b is its projection. Below, I have demonstrated this by holding this marker in an angle and having a light shine from above. The shadow formed is the projection of vector a onto the floor.
+ Projection can be thought of as shining a flashlight perpendicular to the vector $b$, and the shadow cast by $a$ onto $b$ is its projection. Below, I have demonstrated this by holding this marker in an angle and having a light shine from above. The shadow formed is the projection of vector $a$ onto the floor, the vector $b$.
 
 <div align="center">
   <img width="1729" height="1008" alt="image" src="https://github.com/user-attachments/assets/3e542f0d-16d2-49cd-a822-a076efd385fe" />
@@ -55,9 +52,9 @@ A 2d vector can be decomposed into 2 components, a horizontal and a vertical com
 
 One way to interpret dot product is as the magnitude of a vector multiplied by the magnitude of projection of the other vector onto it.
 
-So, we know the magnitude of vector `b`, but we can't take the entire vector `a`'s magnitude here as we are only measuring alignment of vector a on the direction of b, so we need magnitude of the projection.
+So, we know the magnitude of vector $b$, but we can't take the entire vector $a$'s magnitude here as we are only measuring alignment of vector $a$ on the direction of $b$, so we need magnitude of the projection.
 
-we can make a right triangle by dropping a perpendicular line form the tip of vector `a` onto vector `b` as shown in figure below. I've labeled the sides, and the 90 degree angle formed between the projection line and the adjacent side.
+we can make a right triangle by dropping a perpendicular line form the tip of vector $a$ onto vector $b$ as shown in figure below. I've labeled the sides, and the 90 degree angle formed between the projection line and the adjacent side.
 
 <div align="center">
 <img width="780" height="352" alt="image" src="https://github.com/user-attachments/assets/7a5b2965-2db4-48e3-b8c8-832664edb4cb" />
@@ -72,7 +69,14 @@ From the trig definitions, we know these ratios to be true:
 
 *Figure 4: trigonometric ratios*
 </div>
-The projection of `a` onto `b` is equal to the adjacent side of this right angled triangle (indicated by *adj* in figure 2 above), so we need to calculate what the adjacent is in this triangle, and from the trigonometric ratios we have, we can observe that only cos relates adjacent (the side we are interested in) and hypotenuse, which is something we know, the magnitude of `||a||`. Therefore, we use the cos ratio to find the magnitude of the projection of `a` onto `b`.
+
+The projection of $a$ onto $b$ is equal to the adjacent side of this right angled triangle (indicated by *adj* in figure 2 above), so we need to calculate what the adjacent is in this triangle, and from the trigonometric ratios we have, we can observe that only cos relates adjacent (the side we are interested in) and hypotenuse, which is something we know, the magnitude of $||a||$. Therefore, we use the cos ratio to find the magnitude of the projection of $a$ onto $b$.
+
+<div align="center">
+<img width="964" height="429" alt="image" src="https://github.com/user-attachments/assets/f89cdeb0-1f47-4f61-8b3d-a0975ed10454" />
+
+ *Figure 4: finding the adjacent side*
+</div>
 
 Therefore, the magnitude of the projection is: 
 
@@ -80,11 +84,11 @@ $$
 \|\mathbf{a}\|  \cos(\theta) 
 $$
 
-as the magnitude of the projection of `a` onto `b`.
+as the magnitude of the projection of $a$ onto $b$.
 
-So, the overall dot product, of `a` and `b` is then,
+So, the overall dot product, of $a$ and $b$ is then,
 
-the projected magnitude of `a` onto `b` times the magnitude of `b`
+the projected magnitude of $a$ onto $b$ times the magnitude of $b$
 
 **i.e.**
 
@@ -98,9 +102,9 @@ $$
 \mathbf{a} \cdot \mathbf{b} = \mathbf{b} \cdot \mathbf{a}
 $$
 
-Also, using cosine makes sense because of how it behaves. When the angle θ is 0 degrees, we have cosθ = 1, which is maximum alignment and can be thought of as the entire vector contributing to the projection. In the case when the vectors are perpendicular, then θ becomes 90 degrees and cosθ becomes 0, so no alignment, there's no component of one vector in the direction of other.
+Also, using cosine makes sense because of how it behaves. When the angle $θ$ is 0 degrees, we have $cosθ = 1$, which is maximum alignment and can be thought of as the entire vector contributing to the projection. In the case when the vectors are perpendicular, then $θ$ becomes 90 degrees and $cosθ$ becomes 0, so no alignment, there's no component of one vector in the direction of other.
 
-Finally, if the vectors are pointing in the opposite direction then, θ is 180 degrees, so cosθ becomes -1 and the projection is in the opposite direction making the dot product negative.
+Finally, if the vectors are pointing in the opposite direction then, $θ$ is 180 degrees, so $cosθ$ becomes -1 and the projection is in the opposite direction making the dot product negative.
 
 Basically,
 
