@@ -1,7 +1,7 @@
+@import "katex/dist/katex.min.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 html {
   overflow-y: scroll;
   color-scheme: light;
@@ -70,4 +70,32 @@ html #back-to-top {
 
 html.scrolled #back-to-top {
   @apply opacity-100 pointer-events-auto;
+}
+
+
+article :not(pre) > code {
+  @apply rounded bg-stone-200 dark:bg-stone-700 px-1 py-0.5;
+  @apply font-mono font-normal text-[0.9em];
+}
+
+article :not(pre) > code::before,
+article :not(pre) > code::after {
+  content: none;
+}
+
+
+article pre {
+  @apply my-6 overflow-x-auto rounded-xl;
+  @apply border border-stone-200 dark:border-stone-700;
+  @apply bg-stone-100 dark:bg-stone-900 p-4;
+}
+
+article pre code {
+  @apply bg-transparent p-0 rounded-none;
+  @apply font-mono font-normal text-inherit;
+}
+
+article pre code::before,
+article pre code::after {
+  content: none;
 }

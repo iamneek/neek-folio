@@ -12,7 +12,11 @@ When I first came across the geometric formula for dot product, I was not sure a
 
 A dot product is an operation that takes two vectors and produces a single scalar value.
 
-The algebraic definition of a vector dot product looks something like this for vector `a` and `b` :
+The algebraic definition of a vector dot product looks something like this for vector $a$ and $b$ :
+
+```python
+print("Hello world")
+```
 
 $$  
 \mathbf{a} \cdot \mathbf{b} = \sum_{i=1}^{n} a_i b_i = a_1 b_1 + a_2 b_2 + \dots + a_n b_n  
@@ -112,4 +116,3 @@ So, the cosine function in dot product was not arbitrary. It appears naturally w
 
 
 **ADIOS**
-
