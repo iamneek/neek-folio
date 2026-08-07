@@ -119,4 +119,7 @@ $$
 So, the cosine function in dot product was not arbitrary. It appears naturally when calculating projection, and most importantly makes intuitive sense. 
 
 
+<div align="center">
+ 
 **ADIOS**
+</div>
