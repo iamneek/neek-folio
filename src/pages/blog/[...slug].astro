@@ -35,12 +35,16 @@ const { Content } = await post.render();
                 <div class="font-base text-sm">
                     {readingTime(post.body)}
                 </div>
+                &bull;
+                <div class="font-base text-sm">
+                    Neek Kafle
+                </div>
             </div>
-            <div
+            <h1
                 class="animate text-2xl font-semibold text-black dark:text-white"
             >
                 {post.data.title}
-            </div>
+            </h1>
         </div>
         <article class="animate text-justify">
             <Content />

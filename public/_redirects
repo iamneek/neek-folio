@@ -1,0 +1,10 @@
+# 301 Permanent Redirects for legacy Blogger posts to Astro blog
+/2025/02/the-belief-code.html /blog/ 301
+/2024/04/inspirations.html /blog/ 301
+/2024/04/getting-lucky.html /blog/ 301
+/2024/04/music-and-focus.html /blog/ 301
+
+# Catch-all for any other old date-based Blogger posts and feeds
+/2025/* /blog/ 301
+/2024/* /blog/ 301
+/feeds/* /rss.xml 301

@@ -10,12 +10,13 @@ type Props = {
 };
 
 const { title, description } = Astro.props;
+const pageTitle = title.includes("Neek Kafle") ? title : `${title} | ${SITE.NAME}`;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <Head title={`${title} | ${SITE.NAME}`} description={description} />
+    <Head title={pageTitle} description={description} />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"/>
   </head>
   <body>
