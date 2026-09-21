@@ -20,9 +20,9 @@ const allTags = [...new Set(projects.flatMap(project => project.data.tags || [])
   <Container>
     <div class="space-y-10">
       <div class="flex items-center justify-between">
-        <div class="animate font-semibold text-black dark:text-white">
+        <h1 class="animate font-semibold text-black dark:text-white">
           Projects
-        </div>
+        </h1>
         
         {allTags.length > 0 && (
           <div class="animate flex items-center gap-2" data-all-tags={JSON.stringify(allTags)}>

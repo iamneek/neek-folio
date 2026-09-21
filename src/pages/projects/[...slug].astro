@@ -37,11 +37,11 @@ const { Content } = await project.render();
                     {readingTime(project.body)}
                 </div>
             </div>
-            <div
+            <h1
                 class="animate text-2xl font-semibold text-black dark:text-white"
             >
                 {project.data.title}
-            </div>
+            </h1>
             {
                 (project.data.demoURL || project.data.repoURL) && (
                     <nav class="animate flex gap-1">
