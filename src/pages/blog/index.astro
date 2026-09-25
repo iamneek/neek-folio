@@ -106,94 +106,107 @@ const allTags = [...new Set(data.flatMap(post => post.data.tags || []))].sort();
 
 
 
-<script is:inline>
-let _prevTeardown = null;
+<script>
+let abortController: AbortController | null = null;
+let activeDropdown: HTMLElement | null = null;
+let activeSearch: HTMLElement | null = null;
+
+function cleanup() {
+  if (activeDropdown) {
+    activeDropdown.remove();
+    activeDropdown = null;
+  }
+  if (activeSearch) {
+    activeSearch.remove();
+    activeSearch = null;
+  }
+  if (abortController) {
+    abortController.abort();
+    abortController = null;
+  }
+}
+
+document.addEventListener('astro:before-swap', cleanup);
 
 document.addEventListener('astro:page-load', () => {
-  if (_prevTeardown) _prevTeardown();
+  cleanup();
 
+  const blogList = document.getElementById('blog-list');
   const searchToggle = document.getElementById('search-toggle');
   const filterToggle = document.getElementById('filter-toggle');
   const filterParent = filterToggle?.closest('[data-all-tags]');
   const filterCount = document.getElementById('filter-count');
-  const blogList = document.getElementById('blog-list');
-  let activeTags = new Set();
+
+  if (!blogList || !searchToggle || !filterToggle || !filterParent) return;
+
+  abortController = new AbortController();
+  const { signal } = abortController;
+
+  const activeTags = new Set<string>();
   let searchQuery = '';
-  let dropdownEl = null;
-  let searchEl = null;
 
-  if (!searchToggle || !filterToggle || !filterParent) return;
-
-  function removeDropdowns() {
-    if (dropdownEl) { dropdownEl.remove(); dropdownEl = null; }
-    if (searchEl) { searchEl.remove(); searchEl = null; }
-  }
-
-  function onBeforeSwap() {
-    removeDropdowns();
-    onTeardown();
-  }
-
-  function onClick(e) {
-    if (dropdownEl && !dropdownEl.contains(e.target) && e.target !== filterToggle) {
-      dropdownEl.remove();
-      dropdownEl = null;
+  function onClick(e: MouseEvent) {
+    const target = e.target as Node;
+    if (activeDropdown && !activeDropdown.contains(target) && !filterToggle?.contains(target)) {
+      activeDropdown.remove();
+      activeDropdown = null;
     }
-    if (searchEl && !searchEl.contains(e.target) && e.target !== searchToggle) {
-      searchEl.remove();
-      searchEl = null;
+    if (activeSearch && !activeSearch.contains(target) && !searchToggle?.contains(target)) {
+      activeSearch.remove();
+      activeSearch = null;
     }
   }
 
-  function onKeyDown(e) {
-    if (e.key === 'Escape') removeDropdowns();
+  function onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      if (activeDropdown) {
+        activeDropdown.remove();
+        activeDropdown = null;
+      }
+      if (activeSearch) {
+        activeSearch.remove();
+        activeSearch = null;
+      }
+    }
   }
 
-  function onTeardown() {
-    document.removeEventListener('click', onClick);
-    document.removeEventListener('keydown', onKeyDown);
-    document.removeEventListener('astro:before-swap', onBeforeSwap);
-  }
-
-  _prevTeardown = onTeardown;
-
-  document.addEventListener('click', onClick);
-  document.addEventListener('keydown', onKeyDown);
-  document.addEventListener('astro:before-swap', onBeforeSwap, { once: true });
+  document.addEventListener('click', onClick, { signal });
+  document.addEventListener('keydown', onKeyDown, { signal });
 
   searchToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (searchEl) {
-      searchEl.remove();
-      searchEl = null;
+    if (activeSearch) {
+      activeSearch.remove();
+      activeSearch = null;
       return;
     }
-    if (dropdownEl) {
-      dropdownEl.remove();
-      dropdownEl = null;
+    if (activeDropdown) {
+      activeDropdown.remove();
+      activeDropdown = null;
     }
     showSearch();
-  });
+  }, { signal });
 
   filterToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (dropdownEl) {
-      dropdownEl.remove();
-      dropdownEl = null;
+    if (activeDropdown) {
+      activeDropdown.remove();
+      activeDropdown = null;
       return;
     }
-    if (searchEl) {
-      searchEl.remove();
-      searchEl = null;
+    if (activeSearch) {
+      activeSearch.remove();
+      activeSearch = null;
     }
     showDropdown();
-  });
+  }, { signal });
 
   function showSearch() {
-    const rect = searchToggle.getBoundingClientRect();
+    const rect = searchToggle!.getBoundingClientRect();
     const isDark = document.documentElement.classList.contains('dark');
 
-    searchEl = document.createElement('div');
+    const searchEl = document.createElement('div');
+    activeSearch = searchEl;
     searchEl.style.cssText = `
       position: fixed;
       top: ${rect.bottom + 8}px;
@@ -225,7 +238,7 @@ document.addEventListener('astro:page-load', () => {
     `;
 
     input.addEventListener('input', (e) => {
-      searchQuery = e.target.value.toLowerCase();
+      searchQuery = (e.target as HTMLInputElement).value.toLowerCase();
       filterPosts();
     });
 
@@ -235,11 +248,12 @@ document.addEventListener('astro:page-load', () => {
   }
 
   function showDropdown() {
-    const rect = filterToggle.getBoundingClientRect();
+    const rect = filterToggle!.getBoundingClientRect();
     const isDark = document.documentElement.classList.contains('dark');
-    const allTags = JSON.parse(filterParent.getAttribute('data-all-tags') || '[]');
+    const allTags: string[] = JSON.parse(filterParent!.getAttribute('data-all-tags') || '[]');
 
-    dropdownEl = document.createElement('div');
+    const dropdownEl = document.createElement('div');
+    activeDropdown = dropdownEl;
     dropdownEl.style.cssText = `
       position: fixed;
       top: ${rect.bottom + 8}px;
@@ -272,7 +286,7 @@ document.addEventListener('astro:page-load', () => {
     const listContainer = document.createElement('div');
     listContainer.style.cssText = `max-height: 192px; overflow-y: auto; margin-top: 8px;`;
 
-    const checkboxes = [];
+    const checkboxes: HTMLInputElement[] = [];
 
     allTags.forEach(tag => {
       const label = document.createElement('label');
@@ -352,7 +366,7 @@ document.addEventListener('astro:page-load', () => {
     input.focus();
   }
 
-  function fuzzyMatch(text, query) {
+  function fuzzyMatch(text: string, query: string) {
     if (!query) return true;
     text = text.toLowerCase();
     let textIndex = 0;
@@ -365,11 +379,11 @@ document.addEventListener('astro:page-load', () => {
   }
 
   function filterPosts() {
-    const sections = blogList?.querySelectorAll('.year-section');
+    const sections = blogList?.querySelectorAll<HTMLElement>('.year-section');
     if (!sections) return;
 
     sections.forEach(section => {
-      const items = section.querySelectorAll('li');
+      const items = section.querySelectorAll<HTMLElement>('li');
       let visibleCount = 0;
 
       items.forEach(item => {
@@ -391,7 +405,7 @@ document.addEventListener('astro:page-load', () => {
 
         let matchesTags = true;
         if (activeTags.size > 0 && tagsAttr) {
-          const itemTags = JSON.parse(tagsAttr);
+          const itemTags: string[] = JSON.parse(tagsAttr);
           matchesTags = itemTags.some((tag) => activeTags.has(tag));
         } else if (activeTags.size > 0) {
           matchesTags = false;
@@ -402,7 +416,7 @@ document.addEventListener('astro:page-load', () => {
         if (shouldShow) visibleCount++;
       });
 
-      const yearHeader = section.querySelector('.year-header');
+      const yearHeader = section.querySelector<HTMLElement>('.year-header');
       if (yearHeader) {
         yearHeader.style.display = visibleCount > 0 ? '' : 'none';
       }
@@ -413,8 +427,8 @@ document.addEventListener('astro:page-load', () => {
     });
   }
 
-  function updateSeparators(section) {
-    const items = section.querySelectorAll('li');
+  function updateSeparators(section: HTMLElement) {
+    const items = section.querySelectorAll<HTMLElement>('li');
     if (!items) return;
 
     items.forEach((item, index) => {
