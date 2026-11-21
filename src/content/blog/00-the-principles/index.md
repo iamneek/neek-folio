@@ -2,6 +2,7 @@
 title: The Principles
 description: I realized that as a human, it is important to have your own guiding principles in life.
 date: 2026-11-21
+pin: true
 tags: ["Misc", "Personal"]
 ---
 
@@ -20,5 +21,5 @@ I have thought about some of them, some of them, I've borrowed, some were inspir
 6. I will say 'YES' to things I truly want to do, and a 'NO' with genuine reason whenever I feel like I should say a NO.
 7. I will befriend people who have ambitious goals, and are working towards it, and in their surrounding, I'll grow.
 8. I will consistently exercise both my mind and my body.
-9. I will always be playful, because life should only be serious if it's a seriously sad occasion, or if it's related to my goal and my purpose.
+9. I will mostly be playful, because life should only be serious if it's a seriously sad occasion, or if it's related to my goal and my purpose.
 10. I can just do things.
